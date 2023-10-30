@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet"/>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                Home
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="nuevoPersonaje.html">
+                    Nuevo Personaje
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="updatePersonajes.html">
+                    Modificar Personajes
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="/" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Series
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink" id="seriesDropdown">
+                    </ul>
+                </li>
+                </ul>
+            </div>
+            </div>
+        </nav>
+        <form>
+            <label>Nombre: </label>
+            <input type="text" class="form-control" id="cajaNombre"/><br/>
+            <label>Imagen: </label>
+            <input type="text" class="form-control" id="cajaImagen"/><br/>
+            <label for="selectSerie">Serie: </label>
+            <select id="selectSerie">
+
+            </select><br/>
+        </form>
+        <button id="botoninsert">Nuevo Personaje</button>
+    </div>
+    <script src="js/jquery-3.7.1.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script>
+        var urlSeries = "https://apiseriespersonajes.azurewebsites.net/"
+        $(document).ready(function() {
+            loadSeries();
+            var serie = 1;
+            $("#selectSerie").change(function() {
+                var selectedValue = $(this).val();
+                serie = parseInt(selectedValue);
+                console.log("Valor seleccionado:", serie);
+            })
+
+            $("#botoninsert").click(function() {
+                var request = "api/Personajes";
+                var nombre = $("#cajaNombre").val();
+                var imagen = $("#cajaImagen").val();
+                var personaje = new Object();
+                personaje.idPersonaje = 0;
+                personaje.nombre = nombre;
+                personaje.imagen = imagen;
+                personaje.idSerie = serie;
+                var personajeJson = JSON.stringify(personaje);
+                console.log(personaje)
+                console.log(personajeJson)
+                $.ajax({
+                    "url": urlSeries + request,
+                    "type": "POST",
+                    "contentType": "application/json",
+                    "data": personajeJson,
+                    success: function() {
+                        alert("Datos insertados correctamente");
+                    }
+                })
+            })
+        })
+
+        function loadSeries() {
+            var request = "api/series";
+            $.ajax({
+                "url": urlSeries + request,
+                "type": "GET",
+                "dataType": "json",
+                success: function(data){
+                    var html = "";
+                    var html1 = "";
+                    $.each(data,function(index,serie){
+                        html += "<li>";
+                        html += "<a href='detallesSerie.html?idSerie=" + serie.idSerie + "' class='dropdown-item' >" + serie.nombre + "</a>"
+                        html += "</li>";
+                        html1 += "<option value='" + serie.idSerie + "'>" + serie.nombre + "</option>"
+                    })
+                    $("#seriesDropdown").html(html);
+                    $("#selectSerie").html(html1);
+                }
+            })
+        }
+    </script>
+</body>
+</html>

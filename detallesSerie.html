@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet"/>
+</head>
+<body>
+    <div id="app">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                Home
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="nuevoPersonaje.html">
+                    Nuevo Personaje
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="updatePersonajes.html">
+                    Modificar Personajes
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="/" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Series
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink" id="seriesDropdown">
+                    </ul>
+                </li>
+                </ul>
+            </div>
+            </div>
+        </nav>
+        <h1>Detalles Serie</h1>
+        <table class="table table-bordered" style="width: 75%; margin: 0 auto; text-align: center;">
+        <thead>
+            <tr id="nombreSerie"></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="datosSerie"></td>
+            </tr>
+        </tbody>
+        </table>
+    </div>
+    <script src="js/jquery-3.7.1.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script>
+        var urlSeries = "https://apiseriespersonajes.azurewebsites.net/"
+        $(document).ready(function() {
+            loadSeries();
+            loadSerieDetails();
+        })
+
+        function loadSeries() {
+            var request = "api/series";
+            $.ajax({
+                "url": urlSeries + request,
+                "type": "GET",
+                "dataType": "json",
+                success: function(data){
+                    var html = "";
+                    $.each(data,function(index,serie){
+                        html += "<li>";
+                        html += "<a href='detallesSerie.html?idSerie=" + serie.idSerie + "' class='dropdown-item' >" + serie.nombre + "</a>"
+                        html += "</li>";
+                    })
+                    $("#seriesDropdown").html(html);
+                }
+            })
+        }
+
+        function loadSerieDetails() {
+            var params = new window.URLSearchParams(window.location.search);
+            var idSerieUrl = params.get("idSerie");
+            var request = "api/series/" + idSerieUrl;
+            $.ajax({
+                "url": urlSeries + request,
+                "type": "GET",
+                "dataType": "json",
+                success: function(data){
+                    var html1 = "";
+                    var html2 = "";
+                    html1 += "<th>" + data.nombre + "</th>";
+                    html2 += "<img style='width: 100px; height: 100px' src='" + data.imagen + "'/>";
+                    html2 += "<p>" + data.nombre + "</p>";
+                    html2 += "<p>IMDB: " + data.puntuacion + "</p>"
+                    html2 += "<button><a href='personajes.html?idSerie=" + data.idSerie + "'> Personajes </a></button>";
+                    $("#nombreSerie").html(html1);
+                    $("#datosSerie").html(html2);
+                }
+            })
+        }
+    </script>
+</body>
+</html>
